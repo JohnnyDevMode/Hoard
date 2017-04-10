@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1F956C801E9BD8390021675F /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F956C7F1E9BD8390021675F /* Entry.swift */; };
 		1FB138421E9AF4E2009D61D5 /* Hoard.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FB138381E9AF4E2009D61D5 /* Hoard.framework */; };
 		1FB138491E9AF4E2009D61D5 /* Hoard.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FB1383B1E9AF4E2009D61D5 /* Hoard.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1FB138531E9AF505009D61D5 /* Key.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB138521E9AF505009D61D5 /* Key.swift */; };
@@ -31,6 +32,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1F956C7F1E9BD8390021675F /* Entry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Entry.swift; sourceTree = "<group>"; };
 		1FB138381E9AF4E2009D61D5 /* Hoard.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Hoard.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FB1383B1E9AF4E2009D61D5 /* Hoard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Hoard.h; sourceTree = "<group>"; };
 		1FB1383C1E9AF4E2009D61D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 				1FB138591E9AF6BA009D61D5 /* ComplexKey.swift */,
 				1FB1385D1E9AFF89009D61D5 /* Context.swift */,
 				1FB138611E9B0FD0009D61D5 /* Cache.swift */,
+				1F956C7F1E9BD8390021675F /* Entry.swift */,
 			);
 			path = Hoard;
 			sourceTree = "<group>";
@@ -221,6 +224,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F956C801E9BD8390021675F /* Entry.swift in Sources */,
 				1FB1385A1E9AF6BA009D61D5 /* ComplexKey.swift in Sources */,
 				1FB1385E1E9AFF89009D61D5 /* Context.swift in Sources */,
 				1FB138621E9B0FD0009D61D5 /* Cache.swift in Sources */,
@@ -432,6 +436,7 @@
 				1FB1384E1E9AF4E2009D61D5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1FB1384F1E9AF4E2009D61D5 /* Build configuration list for PBXNativeTarget "HoardTests" */ = {
 			isa = XCConfigurationList;
@@ -440,6 +445,7 @@
 				1FB138511E9AF4E2009D61D5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

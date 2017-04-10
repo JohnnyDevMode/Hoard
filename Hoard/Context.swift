@@ -18,7 +18,11 @@ public class Context : NSObject {
       return storage[key]
     }
     set {
-      storage[key] = newValue
+      if let value = newValue {
+        storage[key] = value
+      } else {
+        storage.removeValue(forKey: key)
+      }
     }
   }
   
@@ -38,15 +42,14 @@ public class Context : NSObject {
     }
   }
   
-  public func put(key: Key, value: Any) {
+  public func put<T>(key: Key, value: T) {
     guard let context = contextFor(key: key) else {  return }
-    context[key.last.segment] = value
+    context[key.last.segment] = Entry<T>(value: value)
   }
   
-  
   public func get<T>(key: Key, defaultValue: T? = nil, loader: (() -> T?)? = nil) -> T? {
-    if let context =  contextFor(key: key), let value = context[key.last.segment] as? T {
-      return value
+    if let context =  contextFor(key: key), let entry = context[key.last.segment] as? Entry<T> {
+      return entry.value
     }
     if let loader = loader, let loaded = loader() {
       put(key: key, value: loaded)
@@ -56,8 +59,8 @@ public class Context : NSObject {
   }
   
   public func getAsync<T>(key: Key, loader: (((T?) -> Void) -> Void)? = nil, callback: (T?) -> Void) {
-    if let context =  contextFor(key: key), let value = context[key.last.segment] as? T {
-      return callback(value)
+    if let current : T = get(key: key) {
+      return callback(current)
     }
     if let loader = loader {
       loader { loaded in
@@ -80,8 +83,8 @@ public class Context : NSObject {
     var results = Set<T>()
     guard let parent = contextFor(key: key), let context = parent[key.last.segment] as? Context else {  return results }
     for item in context.storage.values {
-      if let cast = item as? T {
-        results.insert(cast)
+      if let cast = item as? Entry<T> {
+        results.insert(cast.value)
       }
     }
     return results

@@ -13,16 +13,5 @@ public class Cache : Context {
   public static var shared : Cache = {
     return Cache()
   }()
-  
-//  public func get<T>(key: Key, loader: () -> T?) -> T? {
-//    if let current : T = get(key: key) {
-//      return current
-//    }
-//    if let loaded = loader() {
-//      put(key: key, value: loaded)
-//      return loaded
-//    }
-//    return nil
-//  }
-  
+
 }
