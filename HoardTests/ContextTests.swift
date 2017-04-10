@@ -186,4 +186,69 @@ class ContextTests : XCTestCase {
     let intResults : Set<Int> = context.children(key: ComplexKey(segments: ["root", "mid"]))
     XCTAssertEqual(2, intResults.count)
   }
+  
+  func testGetAsync() {
+    let context = Context()
+    let key = SimpleKey(segment: "key")
+    context.put(key: key, value: "value")
+    let exp = expectation(description: "Callback")
+    context.getAsync(key: key) { (result: String?) in
+      XCTAssertEqual("value", result)
+      exp.fulfill()
+    }
+    waitForExpectations(timeout: 1.0, handler: nil)
+  }
+  
+  func testGetAsyncNotFound() {
+    let context = Context()
+    let key = SimpleKey(segment: "key")
+    let exp = expectation(description: "Callback")
+    context.getAsync(key: key) { (result: String?) in
+      XCTAssertNil(result)
+      exp.fulfill()
+    }
+    waitForExpectations(timeout: 1.0, handler: nil)
+  }
+  
+  func testGetAsyncWrongType() {
+    let context = Context()
+    let key = SimpleKey(segment: "key")
+    context.put(key: key, value: "value")
+    let exp = expectation(description: "Callback")
+    context.getAsync(key: key) { (result: Int?) in
+      XCTAssertNil(result)
+      exp.fulfill()
+    }
+    waitForExpectations(timeout: 1.0, handler: nil)
+  }
+  
+  func testGetAsyncCustomLoader() {
+    let context = Context()
+    let key = SimpleKey(segment: "key")
+    let loaderExp = expectation(description: "Loader")
+    let callbackExp = expectation(description: "Callback")
+    context.getAsync(key: key, loader: { done in
+      done("value")
+      loaderExp.fulfill()
+    }) { (result: String?) in
+      XCTAssertEqual("value", result)
+      callbackExp.fulfill()
+    }
+    waitForExpectations(timeout: 1.0, handler: nil)
+  }
+  
+  func testGetAsyncCustomLoaderNoResult() {
+    let context = Context()
+    let key = SimpleKey(segment: "key")
+    let loaderExp = expectation(description: "Loader")
+    let callbackExp = expectation(description: "Callback")
+    context.getAsync(key: key, loader: { done in
+      done(nil)
+      loaderExp.fulfill()
+    }) { (result: String?) in
+      XCTAssertNil(result)
+      callbackExp.fulfill()
+    }
+    waitForExpectations(timeout: 1.0, handler: nil)
+  }
 }

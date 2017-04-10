@@ -114,6 +114,27 @@ let result : String? = context.get(key, loader: {
 })
 ```
 
+Items can also be retrieved using an asynchronous callback mechanism.  This allows you to pass functions the retrieval, but more importantly allows an asynchronous loader function to be used.
+
+```swift
+let context = ...
+let key = Key.from("somekey")
+context.getAsync(key: key, callback: { (result: String?) in
+  print(result)
+})
+```
+
+With a loader:
+```swift
+let context = ...
+let key = Key.from("somekey")
+context.getAsync(key: key, loader: { done in
+  done("value")
+}, callback: { (result: String?) in
+  print(result)
+})
+```
+
 #### Removing Items
 
 Again, you get this....

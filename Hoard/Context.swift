@@ -8,6 +8,7 @@
 
 import Foundation
 
+
 public class Context : NSObject {
   
   fileprivate var storage = [String:Any]()
@@ -52,6 +53,22 @@ public class Context : NSObject {
       return loaded
     }
     return defaultValue
+  }
+  
+  public func getAsync<T>(key: Key, loader: (((T?) -> Void) -> Void)? = nil, callback: (T?) -> Void) {
+    if let context =  contextFor(key: key), let value = context[key.last.segment] as? T {
+      return callback(value)
+    }
+    if let loader = loader {
+      loader { loaded in
+        if let loaded = loaded {
+          put(key: key, value: loaded)
+        }
+        callback(loaded)
+      }
+      return
+    }
+    callback(nil)
   }
   
   public func remove(key: Key) {
