@@ -59,4 +59,15 @@ public class Context : NSObject {
     context.storage.removeValue(forKey: key.last.segment)
   }
   
+  public func children<T>(key: Key) -> Set<T> {
+    var results = Set<T>()
+    guard let parent = contextFor(key: key), let context = parent[key.last.segment] as? Context else {  return results }
+    for item in context.storage.values {
+      if let cast = item as? T {
+        results.insert(cast)
+      }
+    }
+    return results
+  }
+  
 }

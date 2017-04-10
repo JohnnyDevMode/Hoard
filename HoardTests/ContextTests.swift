@@ -158,4 +158,32 @@ class ContextTests : XCTestCase {
     context.remove(key: key)
     XCTAssertNil(context.get(key: key))
   }
+
+  func testChildrenEmpty() {
+    let context = Context()
+    let result : Set<String> = context.children(key: ComplexKey(segments: ["root", "mid"]))
+    XCTAssertEqual(0, result.count)
+  }
+  
+  func testChildren() {
+    let context = Context()
+    context.put(key: ComplexKey(segments: ["root", "mid", "leaf1"]), value: "value1")
+    context.put(key: ComplexKey(segments: ["root", "mid", "leaf2"]), value: "value2")
+    context.put(key: ComplexKey(segments: ["root", "mid", "leaf3"]), value: "value3")
+    let result : Set<String> = context.children(key: ComplexKey(segments: ["root", "mid"]))
+    XCTAssertEqual(3, result.count)
+  }
+  
+  func testChildrenFilters() {
+    let context = Context()
+    context.put(key: ComplexKey(segments: ["root", "mid", "leaf1"]), value: "value1")
+    context.put(key: ComplexKey(segments: ["root", "mid", "leaf2"]), value: 2)
+    context.put(key: ComplexKey(segments: ["root", "mid", "leaf3"]), value: "value3")
+    context.put(key: ComplexKey(segments: ["root", "mid", "leaf4"]), value: 4)
+    context.put(key: ComplexKey(segments: ["root", "mid", "leaf5"]), value: "value5")
+    let stringResult : Set<String> = context.children(key: ComplexKey(segments: ["root", "mid"]))
+    XCTAssertEqual(3, stringResult.count)
+    let intResults : Set<Int> = context.children(key: ComplexKey(segments: ["root", "mid"]))
+    XCTAssertEqual(2, intResults.count)
+  }
 }
