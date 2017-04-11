@@ -46,13 +46,13 @@ public class Context : NSObject {
   
   public func put<T>(key: Key, value: T, validFor: Double = 3600) {
     guard let context = contextFor(key: key) else {  return }
-    context[key.last.segment] = Entry<T>(value: value, validFor: validFor)
+    context[key.last.segment] = Entry(value: value, validFor: validFor)
   }
   
   public func get<T>(key: Key, defaultValue: T? = nil, loader: (() -> T?)? = nil) -> T? {
-    if let context =  contextFor(key: key), let entry = context[key.last.segment] as? Entry<T>, entry.isValid {
+    if let context =  contextFor(key: key), let entry = context[key.last.segment] as? Entry, entry.isValid, let value = entry.value as? T {
       entry.access()
-      return entry.value
+      return value
     }
     if let loader = loader, let loaded = loader() {
       put(key: key, value: loaded)
@@ -90,11 +90,21 @@ public class Context : NSObject {
     var results = Set<T>()
     guard let parent = contextFor(key: key), let context = parent[key.last.segment] as? Context else {  return results }
     for item in context.storage.values {
-      if let cast = item as? Entry<T> {
-        results.insert(cast.value)
+      if let entry = item as? Entry, entry.isValid, let value = entry.value as? T {
+        results.insert(value)
       }
     }
     return results
+  }
+  
+  public func clean() {
+    for (key, value) in storage {
+      if let entry = value as? Entry, !entry.isValid {
+        storage.removeValue(forKey: key)
+      } else if let context = value as? Context {
+        context.clean()
+      }
+    }
   }
   
 }

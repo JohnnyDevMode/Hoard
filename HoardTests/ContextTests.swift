@@ -66,14 +66,14 @@ class ContextTests : XCTestCase {
     let context = Context()
     let key = SimpleKey(segment: "key")
     context.put(key: key, value: "value")
-    XCTAssertEqual("value", (context["key"] as! Entry<String>).value)
+    XCTAssertEqual("value", (context["key"] as! Entry).value as! String)
   }
   
   func testPutComplex() {
     let context = Context()
     let key = ComplexKey(segments: ["root", "mid", "nextmid", "leaf"])
     context.put(key: key, value: "value")
-    XCTAssertEqual("value", (((((context["root"] as! Context)["mid"] as! Context)["nextmid"] as! Context)["leaf"] as! Entry<String>)).value)
+    XCTAssertEqual("value", (((((context["root"] as! Context)["mid"] as! Context)["nextmid"] as! Context)["leaf"] as! Entry)).value as! String)
   }
 
   func testGetSimpleMissing() {
@@ -258,5 +258,21 @@ class ContextTests : XCTestCase {
       callbackExp.fulfill()
     }
     waitForExpectations(timeout: 1.0, handler: nil)
+  }
+  
+  func testClean() {
+    let context = Context()
+    let key = SimpleKey(segment: "key")
+    context.put(key: key, value: "value", validFor: -1)
+    context.clean()
+    XCTAssertNil(context["key"])
+  }
+  
+  func testCleanNested() {
+    let context = Context()
+    let key = ComplexKey(segments: ["complex", "key"])
+    context.put(key: key, value: "value", validFor: -1)
+    context.clean()
+    XCTAssertNil((context["complex"] as! Context)["key"])
   }
 }

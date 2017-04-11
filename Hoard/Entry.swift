@@ -8,9 +8,9 @@
 
 import Foundation
 
-class Entry<T> {
+class Entry {
   
-  let value : T
+  let value : Any
   
   fileprivate let validFor : Double
   
@@ -20,7 +20,7 @@ class Entry<T> {
     return Date().timeIntervalSince(accessed) < validFor
   }
   
-  init(value: T, validFor: Double) {
+  init(value: Any, validFor: Double) {
     self.value = value
     self.validFor = validFor
   }
