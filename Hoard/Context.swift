@@ -11,6 +11,8 @@ import Foundation
 
 public class Context : NSObject {
   
+  fileprivate static let loadQueue = DispatchQueue(label: "com.devmodestudios.hoard")
+  
   fileprivate var storage = [String:Any]()
   
   subscript(key: String) -> Any? {
@@ -59,16 +61,20 @@ public class Context : NSObject {
     return defaultValue
   }
   
-  public func getAsync<T>(key: Key, loader: (((T?) -> Void) -> Void)? = nil, callback: (T?) -> Void) {
+  public func getAsync<T>(key: Key, loader: (((T?) -> Void) -> Void)? = nil, callback: @escaping (T?) -> Void) {
     if let current : T = get(key: key) {
       return callback(current)
     }
     if let loader = loader {
-      loader { loaded in
-        if let loaded = loaded {
-          put(key: key, value: loaded)
+      Context.loadQueue.async {
+        loader { loaded in
+          if let loaded = loaded {
+            self.put(key: key, value: loaded)
+          }
+          DispatchQueue.main.async {
+            callback(loaded)
+          }
         }
-        callback(loaded)
       }
       return
     }
