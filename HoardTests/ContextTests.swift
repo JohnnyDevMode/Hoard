@@ -141,6 +141,14 @@ class ContextTests : XCTestCase {
     XCTAssertEqual(value, resultTwo)
   }
   
+  func testGetExpired() {
+    let context = Context()
+    let key = SimpleKey(segment: "key")
+    context.put(key: key, value: "value", validFor: -1)
+    let result : String? = context.get(key: key)
+    XCTAssertNil(result)
+  }
+  
   func testRemoveSimple() {
     let context = Context()
     let key = SimpleKey(segment: "key")

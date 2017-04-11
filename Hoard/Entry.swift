@@ -14,19 +14,20 @@ class Entry<T> {
   
   fileprivate let validFor : Double
   
-  fileprivate var accessTimestamp = Date()
+  fileprivate var accessed = Date()
   
   var isValid : Bool {
-    return Date().timeIntervalSince(accessTimestamp) < validFor
+    return Date().timeIntervalSince(accessed) < validFor
   }
   
-  init(value: T, validFor: Double = 3600) {
+  init(value: T, validFor: Double) {
     self.value = value
     self.validFor = validFor
   }
   
-  func accessed() {
-    accessTimestamp = Date()
+  func access() {
+    accessed = Date()
   }
 
 }
+		

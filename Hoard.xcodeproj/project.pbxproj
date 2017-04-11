@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1F956C801E9BD8390021675F /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F956C7F1E9BD8390021675F /* Entry.swift */; };
+		1F956C821E9BE31A0021675F /* EntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F956C811E9BE31A0021675F /* EntryTests.swift */; };
 		1FB138421E9AF4E2009D61D5 /* Hoard.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FB138381E9AF4E2009D61D5 /* Hoard.framework */; };
 		1FB138491E9AF4E2009D61D5 /* Hoard.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FB1383B1E9AF4E2009D61D5 /* Hoard.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1FB138531E9AF505009D61D5 /* Key.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB138521E9AF505009D61D5 /* Key.swift */; };
@@ -33,6 +34,7 @@
 
 /* Begin PBXFileReference section */
 		1F956C7F1E9BD8390021675F /* Entry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Entry.swift; sourceTree = "<group>"; };
+		1F956C811E9BE31A0021675F /* EntryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntryTests.swift; sourceTree = "<group>"; };
 		1FB138381E9AF4E2009D61D5 /* Hoard.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Hoard.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FB1383B1E9AF4E2009D61D5 /* Hoard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Hoard.h; sourceTree = "<group>"; };
 		1FB1383C1E9AF4E2009D61D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 				1FB1385B1E9AFD01009D61D5 /* ComplexKeyTests.swift */,
 				1FB1385F1E9B00B8009D61D5 /* ContextTests.swift */,
 				1FB138631E9B159A009D61D5 /* CacheTests.swift */,
+				1F956C811E9BE31A0021675F /* EntryTests.swift */,
 			);
 			path = HoardTests;
 			sourceTree = "<group>";
@@ -239,6 +242,7 @@
 			files = (
 				1FB1385C1E9AFD01009D61D5 /* ComplexKeyTests.swift in Sources */,
 				1FB138581E9AF64C009D61D5 /* KeyTests.swift in Sources */,
+				1F956C821E9BE31A0021675F /* EntryTests.swift in Sources */,
 				1FB138641E9B159A009D61D5 /* CacheTests.swift in Sources */,
 				1FB138601E9B00B8009D61D5 /* ContextTests.swift in Sources */,
 			);

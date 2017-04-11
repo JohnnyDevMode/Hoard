@@ -42,13 +42,14 @@ public class Context : NSObject {
     }
   }
   
-  public func put<T>(key: Key, value: T) {
+  public func put<T>(key: Key, value: T, validFor: Double = 3600) {
     guard let context = contextFor(key: key) else {  return }
-    context[key.last.segment] = Entry<T>(value: value)
+    context[key.last.segment] = Entry<T>(value: value, validFor: validFor)
   }
   
   public func get<T>(key: Key, defaultValue: T? = nil, loader: (() -> T?)? = nil) -> T? {
-    if let context =  contextFor(key: key), let entry = context[key.last.segment] as? Entry<T> {
+    if let context =  contextFor(key: key), let entry = context[key.last.segment] as? Entry<T>, entry.isValid {
+      entry.access()
       return entry.value
     }
     if let loader = loader, let loaded = loader() {
