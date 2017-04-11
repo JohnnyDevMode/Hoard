@@ -78,6 +78,15 @@ let key = Key.from("root", "mid", "leaf")
 context.put(key, "value")
 ```
 
+Each item in the cache is stored with set valid for time.  The default is 1 hour, but it can be overridden per item as part of the put call by passing the `validFor` parameter.
+
+```swift
+let context = ...
+let key = Key.from("somekey")
+context.put(key, "value", validFor: 60) // Valid for 1 minute
+```
+
+
 #### Retrieving Items
 
 Getting an item from the context is pretty straight forward as well.  Invoke the `.get` function with a key.  The result is optional as an item may not exist at that location.
