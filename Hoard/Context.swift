@@ -82,7 +82,7 @@ public class Context : NSObject {
   }
   
   public func remove(key: Key) {
-    guard let context = contextFor(key: key) else {  return }
+    guard let context = contextFor(key: key) else { return }
     context.storage.removeValue(forKey: key.last.segment)
   }
   
@@ -97,7 +97,11 @@ public class Context : NSObject {
     return results
   }
   
-  public func clean() {
+  public func clean(key: Key? = nil) {
+    if let key = key {
+      guard let parent = contextFor(key: key), let context = parent[key.last.segment] as? Context else { return }
+      return context.clean()
+    }
     for (key, value) in storage {
       if let entry = value as? Entry, !entry.isValid {
         storage.removeValue(forKey: key)

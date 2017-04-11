@@ -275,4 +275,15 @@ class ContextTests : XCTestCase {
     context.clean()
     XCTAssertNil((context["complex"] as! Context)["key"])
   }
+  
+  func testCleanChild() {
+    let context = Context()
+    let key = ComplexKey(segments: ["complex", "key"])
+    context.put(key: SimpleKey(segment: "rootvalue"), value: "value", validFor: -1)
+    context.put(key: key, value: "value", validFor: -1)
+    context.clean(key: SimpleKey(segment: "complex"))
+    XCTAssertNotNil(context["rootvalue"])
+    XCTAssertNil((context["complex"] as! Context)["key"])
+  }
+  
 }

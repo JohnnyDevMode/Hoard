@@ -174,6 +174,23 @@ let key = Key.from("root", "mid")
 let stringChildren : Set<String> = context.children(key: key)
 ```
 
+#### Cleaning Context
+
+At times it may be useful to clean the context and remove all the expired items.  This can be done by invoking the `.clean` function on the context.  This will recursively clean the context and all child context of expired items.
+
+```swift
+let context = ...
+context.clean()
+```
+
+You can also clean a child context by passing a key to the clean method.
+
+```swift
+let context = ...
+let key = Key.from("root", "mid")
+context.clean(key: key)
+```
+
 ### Cache
 
 All access to store or retrieve items go through the `Cache` class. The `Cache` class represents the root `Context` for the Hoard library.  
