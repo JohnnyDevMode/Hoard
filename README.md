@@ -191,6 +191,22 @@ let key = Key.from("root", "mid")
 context.clean(key: key)
 ```
 
+There is also an option to deep clean the the context.  A deep cleaning will remove expired options as well as items that have not been recently accessed.  There is a threshold how what should be cleaned that is based on the `validFor` for the item.  So items with longer `validFor` times will be given more time before they are affected by a depp clean.
+
+```swift
+let context = ...
+context.clean(deep: true)
+```
+
+#### Clearing the Context
+
+It is also possible to clear all entries from a context.  Clearing will remove everything in the context.
+
+```swift
+let context = ...
+context.clear()
+```
+
 ### Cache
 
 All access to store or retrieve items go through the `Cache` class. The `Cache` class represents the root `Context` for the Hoard library.  

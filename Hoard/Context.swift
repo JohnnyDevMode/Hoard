@@ -97,18 +97,30 @@ public class Context : NSObject {
     return results
   }
   
-  public func clean(key: Key? = nil) {
+  public func clean(key: Key? = nil, deep: Bool = false) {
     if let key = key {
       guard let parent = contextFor(key: key), let context = parent[key.last.segment] as? Context else { return }
-      return context.clean()
+      return context.clean(deep: deep)
     }
     for (key, value) in storage {
-      if let entry = value as? Entry, !entry.isValid {
-        storage.removeValue(forKey: key)
+      if let entry = value as? Entry {
+        if !entry.isValid {
+          storage.removeValue(forKey: key)
+        } else if deep && entry.isRotten {
+          storage.removeValue(forKey: key)
+        }
       } else if let context = value as? Context {
-        context.clean()
+        context.clean(deep: deep)
       }
     }
+  }
+  
+  public func clear(key: Key? = nil) {
+    if let key = key {
+      guard let parent = contextFor(key: key), let context = parent[key.last.segment] as? Context else { return }
+      return context.clear()
+    }
+    storage.removeAll()
   }
   
 }
