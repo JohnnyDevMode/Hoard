@@ -83,7 +83,7 @@ public class MemoryContext : NSObject, TraversableContext {
     return get(key: key, loader: { done in done(nil) },  callback: callback)
   }
   
-  func get<T>(key: Keyable, loader: @escaping ((T?) -> Void) -> Void, callback: @escaping (T?) -> Void) {
+  public func get<T>(key: Keyable, loader: @escaping ((T?) -> Void) -> Void, callback: @escaping (T?) -> Void) {
     let key = key.asKey()
     if let current : T = get(key: key) {
       return callback(current)

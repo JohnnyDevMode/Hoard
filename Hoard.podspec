@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name        = "Hoard"
-  s.version     = "0.0.1"
+  s.version     = "0.0.2"
   s.summary     = "Hoard is a generic tree-based object cache for iOS development."
   s.homepage    = "https://github.com/JohnnyDevMode/Hoard"
   s.license     = { :type => "MIT" }
