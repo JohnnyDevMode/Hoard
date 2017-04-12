@@ -80,24 +80,24 @@ public class MemoryContext : NSObject, TraversableContext {
   }
 
   public func get<T>(key: Keyable, callback: @escaping (T?) -> Void) {
+    return get(key: key, loader: { done in done(nil) },  callback: callback)
+  }
+  
+  func get<T>(key: Keyable, loader: @escaping ((T?) -> Void) -> Void, callback: @escaping (T?) -> Void) {
     let key = key.asKey()
     if let current : T = get(key: key) {
       return callback(current)
     }
-//    if let loader = loader {
-//      MemoryContext.loadQueue.async {
-//        loader { loaded in
-//          if let loaded = loaded {
-//            self.put(key: key, value: loaded)
-//          }
-//          DispatchQueue.main.async {
-//            callback(loaded)
-//          }
-//        }
-//      }
-//      return
-//    }
-    callback(nil)
+    MemoryContext.loadQueue.async {
+      loader { loaded in
+        if let loaded = loaded {
+          self.put(key: key, value: loaded)
+        }
+        DispatchQueue.main.async {
+          callback(loaded)
+        }
+      }
+    }
   }
   
   public func remove(key: Keyable) {

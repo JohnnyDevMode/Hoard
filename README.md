@@ -129,6 +129,16 @@ context.getAsync(key: "somekey", callback: { (result: String?) in
 })
 ```
 
+With a loader function to be called when a item is not found in cache:
+```swift
+let context = ...
+context.getAsync(key: "somekey", loader: { done in
+  done("value")
+}, callback: { (result: String?) in
+  print(result)
+})
+```
+
 #### Removing Items
 
 Again, you get this....

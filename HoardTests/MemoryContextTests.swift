@@ -122,19 +122,6 @@ class MemoryContextTests : XCTestCase {
     XCTAssertNil(result)
   }
   
-//  
-//  func testGetWithLoader() {
-//    let cache = MemoryContext()
-//    let key = SimpleKey(segment: "key")
-//    let value = "value"
-//    let resultOne = cache.get(key: key) {
-//      return value
-//    }
-//    XCTAssertEqual(value, resultOne)
-//    let resultTwo : String? = cache.get(key: key)
-//    XCTAssertEqual(value, resultTwo)
-//  }
-  
   func testGetExpired() {
     let context = MemoryContext()
     let key = SimpleKey(key: "key")
@@ -224,35 +211,33 @@ class MemoryContextTests : XCTestCase {
     waitForExpectations(timeout: 1.0, handler: nil)
   }
   
-//  func testGetAsyncCustomLoader() {
-//    let context = MemoryContext()
-//    let key = SimpleKey(segment: "key")
-//    let loaderExp = expectation(description: "Loader")
-//    let callbackExp = expectation(description: "Callback")
-//    context.get(key: key, loader: { done in
-//      done("value")
-//      loaderExp.fulfill()
-//    }) { (result: String?) in
-//      XCTAssertEqual("value", result)
-//      callbackExp.fulfill()
-//    }
-//    waitForExpectations(timeout: 1.0, handler: nil)
-//  }
-//  
-//  func testGetAsyncCustomLoaderNoResult() {
-//    let context = MemoryContext()
-//    let key = SimpleKey(segment: "key")
-//    let loaderExp = expectation(description: "Loader")
-//    let callbackExp = expectation(description: "Callback")
-//    context.get(key: key, loader: { done in
-//      done(nil)
-//      loaderExp.fulfill()
-//    }) { (result: String?) in
-//      XCTAssertNil(result)
-//      callbackExp.fulfill()
-//    }
-//    waitForExpectations(timeout: 1.0, handler: nil)
-//  }
+  func testGetAsyncCustomLoader() {
+    let context = MemoryContext()
+    let loaderExp = expectation(description: "Loader")
+    let callbackExp = expectation(description: "Callback")
+    context.get(key: "key", loader: { done in
+      done("value")
+      loaderExp.fulfill()
+    }) { (result: String?) in
+      XCTAssertEqual("value", result)
+      callbackExp.fulfill()
+    }
+    waitForExpectations(timeout: 1.0, handler: nil)
+  }
+  
+  func testGetAsyncCustomLoaderNoResult() {
+    let context = MemoryContext()
+    let loaderExp = expectation(description: "Loader")
+    let callbackExp = expectation(description: "Callback")
+    context.get(key: "key", loader: { done in
+      done(nil)
+      loaderExp.fulfill()
+    }) { (result: String?) in
+      XCTAssertNil(result)
+      callbackExp.fulfill()
+    }
+    waitForExpectations(timeout: 1.0, handler: nil)
+  }
   
   func testClean() {
     let context = MemoryContext()
