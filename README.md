@@ -32,7 +32,7 @@ Or using the Objective-C framework:
 ```
 
 
-## Main Classes
+## Main Types
 
 ### Key
 
@@ -50,15 +50,34 @@ Complex:
 let key = Key.from("root", "branch", "leaf")
 ```
 
-### Context
+### Keyable
 
-The `Context` class represents a location in the tree to store items. All primary functions on the `Context` require a `Key` to operate.  The more interesting aspect is the tree nature of the context.  It is possible for an item in a context to be another context and create multiple branches.  
+In order to simplify the usage of keys, the cache can use anything that adheres to the `Keyable` protocol.  This allows simplistic interaction with full segmented keys support.  Hoard provides `Keyable` extensions for `String` and `NSURL`.  Both of these will create complex keys representing a path like structure. So any string will be separated by `/` character and URLS are treated the same way, but also include any host information as its root segment.
 
-#### Creating a Context
+String paths:
+```swift
+let keyOne = "somekey".asKey()
+let keyTwo = Key.from("somekey")
+assert(keyOne == keyTwo)
+```
 
 ```swift
-let context = Context()
+let keyOne = "root/branch/leaf".asKey()
+let keyTwo = Key.from("root", "branch", "leaf")
+assert(keyOne == keyTwo)
 ```
+
+URLs:
+```swift
+let url = NSURL(string: "http://cdn.google.com/some/asset.png")!
+let keyOne = url.asKey()
+let keyTwo = Key.from("cdn.google.com", "some", "asset.png")
+assert(keyOne == keyTwo)
+```
+
+### Context
+
+The `Context` protocol represents a location in the tree to store items. All primary functions on the `Context` require a `Keyable` to operate.  The more interesting aspect is the tree nature of the context.  It is possible for an item in a context to be another context and create multiple branches.  These nested branches can have different behavior and can be independently manipulated.
 
 #### Storing Items
 
@@ -66,8 +85,7 @@ Putting an item is as one would expect.  You simply invoke the `.put` function w
 
 ```swift
 let context = ...
-let key = Key.from("somekey")
-context.put(key, "value")
+context.put("somekey", "value")
 ```
 
 The `Context` class will automatically create any child contexts required to support the provided key.  If the key provided is complex, it will create any intermediate contexts.  
@@ -82,8 +100,7 @@ Each item in the cache is stored with set valid for time.  The default is 1 hour
 
 ```swift
 let context = ...
-let key = Key.from("somekey")
-context.put(key, "value", validFor: 60) // Valid for 1 minute
+context.put("somekey", "value", validFor: 60) // Valid for 1 minute
 ```
 
 
@@ -93,53 +110,21 @@ Getting an item from the context is pretty straight forward as well.  Invoke the
 
 ```swift
 let context = ...
-let key = Key.from("somekey")
-let result = context.get(key)
+let result = context.get("somekey")
 ```
 
 The get function also allows a captured type.  If you use a type capture it will return `nil` if the value for this key is not of the requested type.
 
 ```swift
 let context = ...
-let key = Key.from("somekey")
-let result : String? = context.get(key)
+let result : String? = context.get("somekey")
 ```
 
-You can spiff it up a bit by using a default value.  This will be returned if an item doesn't exist for this key.
+Items can also be retrieved using an asynchronous callback mechanism.
 
 ```swift
 let context = ...
-let key = Key.from("somekey")
-let result : String? = context.get(key, defaultValue: "somevalue")
-```
-
-You can also provide a loader function that will be called if the key does not exist. This is similar to the default value, but difference in two major ways.  The loader function allows complex logic over a simple value and more importantly performs a `.put` of the result of the loader function.  
-
-```swift
-let context = ...
-let key = Key.from("somekey")
-let result : String? = context.get(key, loader: {
-  return "somevalue"
-})
-```
-
-Items can also be retrieved using an asynchronous callback mechanism.  This allows you to pass functions the retrieval, but more importantly allows an asynchronous loader function to be used.
-
-```swift
-let context = ...
-let key = Key.from("somekey")
-context.getAsync(key: key, callback: { (result: String?) in
-  print(result)
-})
-```
-
-With a loader:
-```swift
-let context = ...
-let key = Key.from("somekey")
-context.getAsync(key: key, loader: { done in
-  done("value")
-}, callback: { (result: String?) in
+context.getAsync(key: "somekey", callback: { (result: String?) in
   print(result)
 })
 ```
@@ -150,8 +135,7 @@ Again, you get this....
 
 ```swift
 let context = ...
-let key = Key.from("somekey")
-context.remove(key)
+context.remove("somekey")
 ```
 
 One thing to keep in mind, is that removing with a key that represents a child context will remove the context and all child items in the tree.  This a powerful mechanism for pruning the tree efficiently.  
@@ -166,12 +150,11 @@ context.remove(Key.from("users"))
 
 #### Getting All Items at a Context
 
-As previously mentioned, sub-context items are possible in the `Context`.  There may be some interesting reasons to get all the items under a give context.  This can be achieved with the `.children` function.  This function will return all direct child items of the requested type.  It will ignore any child items that do not match the requested type.
+There may be some interesting reasons to get all the items under a give context.  This can be achieved with the `.children` function.  This function will return all direct child items of the requested type.  It will ignore any child items that do not match the requested type.
 
 ```swift
 let context = ...
-let key = Key.from("root", "mid")
-let stringChildren : Set<String> = context.children(key: key)
+let stringChildren : Set<String> = context.children()
 ```
 
 #### Cleaning Context
@@ -181,14 +164,6 @@ At times it may be useful to clean the context and remove all the expired items.
 ```swift
 let context = ...
 context.clean()
-```
-
-You can also clean a child context by passing a key to the clean method.
-
-```swift
-let context = ...
-let key = Key.from("root", "mid")
-context.clean(key: key)
 ```
 
 There is also an option to deep clean the the context.  A deep cleaning will remove expired options as well as items that have not been recently accessed.  There is a threshold how what should be cleaned that is based on the `validFor` for the item.  So items with longer `validFor` times will be given more time before they are affected by a depp clean.
@@ -207,9 +182,19 @@ let context = ...
 context.clear()
 ```
 
+### MemoryContext
+
+The `MemoryContext` class is a basic in-memory only context.  This will not store anything to disk or do any sophisticated pass through loading.
+
+#### Creating
+
+```swift
+let context = MemoryContext()
+```
+
 ### Cache
 
-All access to store or retrieve items go through the `Cache` class. The `Cache` class represents the root `Context` for the Hoard library.  
+The `Cache` class represents the root `Context` for the Hoard library.  
 
 Creating a Cache:
 

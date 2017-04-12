@@ -10,12 +10,14 @@ import Foundation
 
 public class SimpleKey : Key {
   
+  public let key : String
+  
   public override var description: String {
-    return segment
+    return key
   }
   
-  public override init(segment: String) {
-    super.init(segment: segment)
+  public init(key: String) {
+    self.key = key
   }
   
 }

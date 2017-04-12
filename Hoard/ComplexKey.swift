@@ -10,10 +10,7 @@ import Foundation
 
 public class ComplexKey : Key {
   
-  public var head : String {
-    return super.segment
-  }
-  
+  public let head: String
   public let tail : Key
   
   override var last: Key {
@@ -21,12 +18,12 @@ public class ComplexKey : Key {
   }
   
   public override var description: String {
-    return head + "." + tail.description
+    return head + "/" + tail.description
   }
   
   init(segments: [String]) {
     tail = segments.count > 1 ? Key.from(segments: Array(segments.suffix(from: 1))) : Key.Invalid
-    super.init(segment: segments.first ?? Key.Invalid.segment)
+    head = segments.first ?? "INVALID"
   }
   
 }

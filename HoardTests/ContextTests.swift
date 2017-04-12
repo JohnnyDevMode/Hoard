@@ -1,5 +1,5 @@
 //
-//  ContextTests.swift
+//  MemoryContextTests.swift
 //  Hoard
 //
 //  Created by John Bailey on 4/9/17.
@@ -10,104 +10,104 @@ import XCTest
 @testable import Hoard
 
 
-class ContextTests : XCTestCase {
+class MemoryContextTests : XCTestCase {
 
   func testContextForSimple() {
-    let context = Context()
-    let result = context.contextFor(key: SimpleKey(segment: "key"))
+    let context = MemoryContext()
+    let result = context.contextFor(key: SimpleKey(key: "key")) as! MemoryContext
     XCTAssertEqual(context, result)
   }
   
   func testContextForInvalidRoot() {
-    let context = Context()
+    let context = MemoryContext()
     context["root"] = "value"
     let result = context.contextFor(key: ComplexKey(segments: ["root", "leaf"]))
     XCTAssertNil(result)
   }
   
   func testContextForChildContext() {
-    let context = Context()
-    let childContext = Context()
+    let context = MemoryContext()
+    let childContext = MemoryContext()
     context["root"] = childContext
-    let result = context.contextFor(key: ComplexKey(segments: ["root", "leaf"]))
+    let result = context.contextFor(key: ComplexKey(segments: ["root", "leaf"])) as! MemoryContext
     XCTAssertEqual(childContext, result)
   }
   
   func testContextForNestedChildContext() {
-    let context = Context()
-    let rootContext = Context()
+    let context = MemoryContext()
+    let rootContext = MemoryContext()
     context["root"] = rootContext
-    let midContext = Context()
+    let midContext = MemoryContext()
     rootContext["mid"] = midContext
-    let result = context.contextFor(key: ComplexKey(segments: ["root", "mid", "leaf"]))
+    let result = context.contextFor(key: ComplexKey(segments: ["root", "mid", "leaf"])) as! MemoryContext
     XCTAssertEqual(midContext, result)
   }
   
   func testContextForDoubleNestedChildContext() {
-    let context = Context()
-    let rootContext = Context()
+    let context = MemoryContext()
+    let rootContext = MemoryContext()
     context["root"] = rootContext
-    let midContext = Context()
+    let midContext = MemoryContext()
     rootContext["mid"] = midContext
-    let nextMidContext = Context()
+    let nextMidContext = MemoryContext()
     midContext["nextmid"] = nextMidContext
-    let result = context.contextFor(key: ComplexKey(segments: ["root", "mid", "nextmid", "leaf"]))
+    let result = context.contextFor(key: ComplexKey(segments: ["root", "mid", "nextmid", "leaf"])) as! MemoryContext
     XCTAssertEqual(nextMidContext, result)
   }
   
   func testContextForWithCreate() {
-    let context = Context()
-    let result = context.contextFor(key: ComplexKey(segments: ["root", "mid", "nextmid", "leaf"]))
+    let context = MemoryContext()
+    let result = context.contextFor(key: ComplexKey(segments: ["root", "mid", "nextmid", "leaf"])) as! MemoryContext
     XCTAssertNotNil(result)
-    XCTAssertEqual(result, (((context["root"] as! Context)["mid"] as! Context)["nextmid"] as! Context))
+    XCTAssertEqual(result, (((context["root"] as! MemoryContext)["mid"] as! MemoryContext)["nextmid"] as! MemoryContext))
   }
  
   func testPutSimple() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
+    let context = MemoryContext()
+    let key = SimpleKey(key: "key")
     context.put(key: key, value: "value")
     XCTAssertEqual("value", (context["key"] as! Entry).value as! String)
   }
   
   func testPutComplex() {
-    let context = Context()
+    let context = MemoryContext()
     let key = ComplexKey(segments: ["root", "mid", "nextmid", "leaf"])
     context.put(key: key, value: "value")
-    XCTAssertEqual("value", (((((context["root"] as! Context)["mid"] as! Context)["nextmid"] as! Context)["leaf"] as! Entry)).value as! String)
+    XCTAssertEqual("value", (((((context["root"] as! MemoryContext)["mid"] as! MemoryContext)["nextmid"] as! MemoryContext)["leaf"] as! Entry)).value as! String)
   }
 
   func testGetSimpleMissing() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
+    let context = MemoryContext()
+    let key = SimpleKey(key: "key")
     let result : String? = context.get(key: key)
     XCTAssertNil(result)
   }
   
   func testGetSimple() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
+    let context = MemoryContext()
+    let key = SimpleKey(key: "key")
     context.put(key: key, value: "value")
     let result : String? = context.get(key: key)
     XCTAssertEqual("value", result)
   }
   
   func testGetSimpleWrongType() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
+    let context = MemoryContext()
+    let key = SimpleKey(key: "key")
     context.put(key: key, value: "value")
     let result : Int? = context.get(key: key)
     XCTAssertNil(result)
   }
   
   func testGetComplexMissing() {
-    let context = Context()
+    let context = MemoryContext()
     let key = ComplexKey(segments: ["root", "mid", "nextmid", "leaf"])
     let result : String? = context.get(key: key)
     XCTAssertNil(result)
   }
   
   func testGetComplex() {
-    let context = Context()
+    let context = MemoryContext()
     let key = ComplexKey(segments: ["root", "mid", "nextmid", "leaf"])
     context.put(key: key, value: "value")
     let result : String? = context.get(key: key)
@@ -115,43 +115,37 @@ class ContextTests : XCTestCase {
   }
   
   func testGetComplexWrongType() {
-    let context = Context()
+    let context = MemoryContext()
     let key = ComplexKey(segments: ["root", "mid", "nextmid", "leaf"])
     context.put(key: key, value: "value")
     let result : Int? = context.get(key: key)
     XCTAssertNil(result)
   }
   
-  func testGetWithDefault() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
-    let result : String? = context.get(key: key, defaultValue: "value")
-    XCTAssertEqual("value", result)
-  }
-  
-  func testGetWithLoader() {
-    let cache = Cache()
-    let key = SimpleKey(segment: "key")
-    let value = "value"
-    let resultOne = cache.get(key: key) {
-      return value
-    }
-    XCTAssertEqual(value, resultOne)
-    let resultTwo : String? = cache.get(key: key)
-    XCTAssertEqual(value, resultTwo)
-  }
+//  
+//  func testGetWithLoader() {
+//    let cache = MemoryContext()
+//    let key = SimpleKey(segment: "key")
+//    let value = "value"
+//    let resultOne = cache.get(key: key) {
+//      return value
+//    }
+//    XCTAssertEqual(value, resultOne)
+//    let resultTwo : String? = cache.get(key: key)
+//    XCTAssertEqual(value, resultTwo)
+//  }
   
   func testGetExpired() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
+    let context = MemoryContext()
+    let key = SimpleKey(key: "key")
     context.put(key: key, value: "value", validFor: -1)
     let result : String? = context.get(key: key)
     XCTAssertNil(result)
   }
   
   func testRemoveSimple() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
+    let context = MemoryContext()
+    let key = SimpleKey(key: "key")
     context.put(key: key, value: "value" as Any)
     XCTAssertNotNil(context.get(key: key))
     context.remove(key: key)
@@ -159,7 +153,7 @@ class ContextTests : XCTestCase {
   }
   
   func testRemoveComplex() {
-    let context = Context()
+    let context = MemoryContext()
     let key = ComplexKey(segments: ["root", "mid", "nextmid", "leaf"])
     context.put(key: key, value: "value" as Any)
     XCTAssertNotNil(context.get(key: key))
@@ -168,39 +162,39 @@ class ContextTests : XCTestCase {
   }
 
   func testChildrenEmpty() {
-    let context = Context()
-    let result : Set<String> = context.children(key: ComplexKey(segments: ["root", "mid"]))
+    let context = MemoryContext()
+    let result : Set<String> = context.children()
     XCTAssertEqual(0, result.count)
   }
   
   func testChildren() {
-    let context = Context()
-    context.put(key: ComplexKey(segments: ["root", "mid", "leaf1"]), value: "value1")
-    context.put(key: ComplexKey(segments: ["root", "mid", "leaf2"]), value: "value2")
-    context.put(key: ComplexKey(segments: ["root", "mid", "leaf3"]), value: "value3")
-    let result : Set<String> = context.children(key: ComplexKey(segments: ["root", "mid"]))
+    let context = MemoryContext()
+    context.put(key: "key1", value: "value1")
+    context.put(key: "key2", value: "value2")
+    context.put(key: "key3", value: "value3")
+    let result : Set<String> = context.children()
     XCTAssertEqual(3, result.count)
   }
   
   func testChildrenFilters() {
-    let context = Context()
-    context.put(key: ComplexKey(segments: ["root", "mid", "leaf1"]), value: "value1")
-    context.put(key: ComplexKey(segments: ["root", "mid", "leaf2"]), value: 2)
-    context.put(key: ComplexKey(segments: ["root", "mid", "leaf3"]), value: "value3")
-    context.put(key: ComplexKey(segments: ["root", "mid", "leaf4"]), value: 4)
-    context.put(key: ComplexKey(segments: ["root", "mid", "leaf5"]), value: "value5")
-    let stringResult : Set<String> = context.children(key: ComplexKey(segments: ["root", "mid"]))
+    let context = MemoryContext()
+    context.put(key: "key1", value: "value1")
+    context.put(key: "key2", value: 2)
+    context.put(key: "key3", value: "value3")
+    context.put(key: "key4", value: 4)
+    context.put(key: "key5", value: "value5")
+    let stringResult : Set<String> = context.children()
     XCTAssertEqual(3, stringResult.count)
-    let intResults : Set<Int> = context.children(key: ComplexKey(segments: ["root", "mid"]))
+    let intResults : Set<Int> = context.children()
     XCTAssertEqual(2, intResults.count)
   }
   
   func testGetAsync() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
+    let context = MemoryContext()
+    let key = SimpleKey(key: "key")
     context.put(key: key, value: "value")
     let exp = expectation(description: "Callback")
-    context.getAsync(key: key) { (result: String?) in
+    context.get(key: key) { (result: String?) in
       XCTAssertEqual("value", result)
       exp.fulfill()
     }
@@ -208,10 +202,10 @@ class ContextTests : XCTestCase {
   }
   
   func testGetAsyncNotFound() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
+    let context = MemoryContext()
+    let key = SimpleKey(key: "key")
     let exp = expectation(description: "Callback")
-    context.getAsync(key: key) { (result: String?) in
+    context.get(key: key) { (result: String?) in
       XCTAssertNil(result)
       exp.fulfill()
     }
@@ -219,87 +213,87 @@ class ContextTests : XCTestCase {
   }
   
   func testGetAsyncWrongType() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
+    let context = MemoryContext()
+    let key = SimpleKey(key: "key")
     context.put(key: key, value: "value")
     let exp = expectation(description: "Callback")
-    context.getAsync(key: key) { (result: Int?) in
+    context.get(key: key) { (result: Int?) in
       XCTAssertNil(result)
       exp.fulfill()
     }
     waitForExpectations(timeout: 1.0, handler: nil)
   }
   
-  func testGetAsyncCustomLoader() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
-    let loaderExp = expectation(description: "Loader")
-    let callbackExp = expectation(description: "Callback")
-    context.getAsync(key: key, loader: { done in
-      done("value")
-      loaderExp.fulfill()
-    }) { (result: String?) in
-      XCTAssertEqual("value", result)
-      callbackExp.fulfill()
-    }
-    waitForExpectations(timeout: 1.0, handler: nil)
-  }
-  
-  func testGetAsyncCustomLoaderNoResult() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
-    let loaderExp = expectation(description: "Loader")
-    let callbackExp = expectation(description: "Callback")
-    context.getAsync(key: key, loader: { done in
-      done(nil)
-      loaderExp.fulfill()
-    }) { (result: String?) in
-      XCTAssertNil(result)
-      callbackExp.fulfill()
-    }
-    waitForExpectations(timeout: 1.0, handler: nil)
-  }
+//  func testGetAsyncCustomLoader() {
+//    let context = MemoryContext()
+//    let key = SimpleKey(segment: "key")
+//    let loaderExp = expectation(description: "Loader")
+//    let callbackExp = expectation(description: "Callback")
+//    context.get(key: key, loader: { done in
+//      done("value")
+//      loaderExp.fulfill()
+//    }) { (result: String?) in
+//      XCTAssertEqual("value", result)
+//      callbackExp.fulfill()
+//    }
+//    waitForExpectations(timeout: 1.0, handler: nil)
+//  }
+//  
+//  func testGetAsyncCustomLoaderNoResult() {
+//    let context = MemoryContext()
+//    let key = SimpleKey(segment: "key")
+//    let loaderExp = expectation(description: "Loader")
+//    let callbackExp = expectation(description: "Callback")
+//    context.get(key: key, loader: { done in
+//      done(nil)
+//      loaderExp.fulfill()
+//    }) { (result: String?) in
+//      XCTAssertNil(result)
+//      callbackExp.fulfill()
+//    }
+//    waitForExpectations(timeout: 1.0, handler: nil)
+//  }
   
   func testClean() {
-    let context = Context()
-    let key = SimpleKey(segment: "key")
+    let context = MemoryContext()
+    let key = SimpleKey(key: "key")
     context.put(key: key, value: "value", validFor: -1)
     context.clean()
     XCTAssertNil(context["key"])
   }
   
   func testCleanNested() {
-    let context = Context()
+    let context = MemoryContext()
     let key = ComplexKey(segments: ["complex", "key"])
     context.put(key: key, value: "value", validFor: -1)
     context.clean()
-    XCTAssertNil((context["complex"] as! Context)["key"])
+    XCTAssertNil((context["complex"] as! MemoryContext)["key"])
   }
   
   func testCleanChild() {
-    let context = Context()
+    let context = MemoryContext()
     let key = ComplexKey(segments: ["complex", "key"])
-    context.put(key: SimpleKey(segment: "rootvalue"), value: "value", validFor: -1)
+    context.put(key: SimpleKey(key: "rootvalue"), value: "value", validFor: -1)
     context.put(key: key, value: "value", validFor: -1)
-    context.clean(key: SimpleKey(segment: "complex"))
+    (context.get(key: "complex") as Context?)?.clean(deep: false)
     XCTAssertNotNil(context["rootvalue"])
-    XCTAssertNil((context["complex"] as! Context)["key"])
+    XCTAssertNil((context["complex"] as! MemoryContext)["key"])
   }
   
   func testClear() {
-    let context = Context()
-    context.put(key: SimpleKey(segment: "key"), value: "value")
+    let context = MemoryContext()
+    context.put(key: SimpleKey(key: "key"), value: "value")
     context.clear()
     XCTAssertNil(context["key"])
   }
   
   func testClearChild() {
-    let context = Context()
+    let context = MemoryContext()
     let key = ComplexKey(segments: ["complex", "key"])
-    context.put(key: SimpleKey(segment: "rootvalue"), value: "value")
+    context.put(key: SimpleKey(key: "rootvalue"), value: "value")
     context.put(key: key, value: "value")
-    context.clear(key: SimpleKey(segment: "complex"))
+    (context.get(key: "complex") as Context?)?.clear()
     XCTAssertNotNil(context["rootvalue"])
-    XCTAssertNil((context["complex"] as! Context)["key"])
+    XCTAssertNil((context["complex"] as! MemoryContext)["key"])
   }
 }

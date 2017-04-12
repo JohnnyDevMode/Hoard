@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class Cache : Context {
+public class Cache : MemoryContext {
   
   public static var shared : Cache = {
     return Cache()
