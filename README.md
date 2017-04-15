@@ -103,7 +103,6 @@ let context = ...
 context.put("somekey", "value", validFor: 60) // Valid for 1 minute
 ```
 
-
 #### Retrieving Items
 
 Getting an item from the context is pretty straight forward as well.  Invoke the `.get` function with a key.  The result is optional as an item may not exist at that location.
@@ -158,16 +157,16 @@ context.put(Key.from("users", "3456"), userThree)
 context.remove(Key.from("users"))
 ```
 
-#### Getting All Items at a Context
+<!-- #### Getting All Items at a Context
 
 There may be some interesting reasons to get all the items under a give context.  This can be achieved with the `.children` function.  This function will return all direct child items of the requested type.  It will ignore any child items that do not match the requested type.
 
 ```swift
 let context = ...
 let stringChildren : Set<String> = context.children()
-```
+``` -->
 
-#### Cleaning Context
+<!-- #### Cleaning Context
 
 At times it may be useful to clean the context and remove all the expired items.  This can be done by invoking the `.clean` function on the context.  This will recursively clean the context and all child context of expired items.
 
@@ -181,7 +180,7 @@ There is also an option to deep clean the the context.  A deep cleaning will rem
 ```swift
 let context = ...
 context.clean(deep: true)
-```
+``` -->
 
 #### Clearing the Context
 
@@ -200,6 +199,16 @@ The `MemoryContext` class is a basic in-memory only context.  This will not stor
 
 ```swift
 let context = MemoryContext()
+```
+
+### DiskContext
+
+The `DiskContext` class is a basic on-disk only context.  This will not store anything in memory.
+
+#### Creating
+
+```swift
+let context = DiskContext(dirUrl: localUrl)
 ```
 
 ### Cache
