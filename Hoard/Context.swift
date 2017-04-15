@@ -16,9 +16,9 @@ protocol Context {
   
   func get<T>(key: Keyable, callback: @escaping (T?) -> Void)
   
-  func remove(key: Keyable)
+  func get<T>(key: Keyable, loader: @escaping (@escaping (T?) -> Void) -> Void, callback: @escaping (T?) -> Void)
   
-  func children<T>() -> Set<T>
+  func remove(key: Keyable)
   
   func clean()
   

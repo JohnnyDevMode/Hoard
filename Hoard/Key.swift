@@ -57,3 +57,16 @@ extension NSURL : Keyable {
   }
   
 }
+
+extension URL : Keyable {
+  
+  public func asKey() -> Key {
+    var segments = [String]()
+    if let host = self.host {
+      segments.append(host)
+    }
+    segments.append(contentsOf: path.components(separatedBy: "/").filter({!$0.isEmpty}))
+    return Key.from(segments: segments)
+  }
+  
+}
