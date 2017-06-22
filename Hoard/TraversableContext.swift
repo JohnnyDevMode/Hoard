@@ -10,12 +10,15 @@ import Foundation
 
 public class TraversableContext : NSObject, Context {
   
+  public var expiry: Double = 3600
+  
   var childContexts = [String:Context]()
     
   func contextFor(key: Key) -> Context? {
     if let complexKey = key as? ComplexKey {
       if childContexts[complexKey.head] == nil {
         let next = createChild(key: complexKey.head)
+        next.expiry = expiry
         childContexts[complexKey.head] = next
         return next.contextFor(key: complexKey.tail)
       }

@@ -14,32 +14,30 @@ class Entry {
   
   let value : Any
   
-  fileprivate let validFor : Double
   
   fileprivate let created = Date()
   
   var accessed = Date()
   
-  var isValid : Bool {
-    return Date().timeIntervalSince(created) < validFor
+  func isValid(expiry: Double) -> Bool {
+    return Date().timeIntervalSince(created) < expiry
   }
   
   var drift : Double {
     return Date().timeIntervalSince(accessed)
   }
   
-  var rot : Double {
-    guard validFor > 0 else { return 1 }
-    return drift / validFor
+  func rot(expiry: Double) -> Double {
+    guard expiry > 0 else { return 1 }
+    return drift / expiry
   }
   
-  var isRotten : Bool {
-    return rot > ROT_THRESHOLD
+  func isRotten(expiry: Double) -> Bool {
+    return rot(expiry: expiry) > ROT_THRESHOLD
   }
   
-  init(value: Any, validFor: Double) {
+  init(value: Any) {
     self.value = value
-    self.validFor = validFor
   }
   
   func access() {

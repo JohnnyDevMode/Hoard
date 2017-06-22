@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name        = "Hoard"
-  s.version     = "0.0.3"
+  s.version     = "0.1.0"
   s.summary     = "Hoard is a generic tree-based object cache for iOS development."
   s.homepage    = "https://github.com/JohnnyDevMode/Hoard"
   s.license     = { :type => "MIT" }
@@ -14,6 +14,6 @@ Pod::Spec.new do |s|
   s.source   = { :git => "https://github.com/JohnnyDevMode/Hoard.git", :tag => s.version }
   s.source_files = "Hoard/*.swift"
   s.pod_target_xcconfig =  {
-        'SWIFT_VERSION' => '3.0',
+        'SWIFT_VERSION' => '3.1',
   }
 end

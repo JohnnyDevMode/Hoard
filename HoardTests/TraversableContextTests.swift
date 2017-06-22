@@ -57,6 +57,21 @@ class TraversableContextTests : XCTestCase {
     XCTAssertEqual(result, nextmid)
   }
   
+  func testContextForWithCreateSetsExpiry() {
+    let context = TraversableContext()
+    context.expiry = 99
+    let result = context.contextFor(key: ComplexKey(segments: ["root", "mid", "nextmid", "leaf"])) as! TraversableContext
+    XCTAssertNotNil(result)
+    let root : TraversableContext? = context.get(key: "root")
+    XCTAssertEqual(99, root!.expiry)
+    let mid : TraversableContext? = root?.get(key: "mid")
+    XCTAssertEqual(99, mid!.expiry)
+    let nextmid : TraversableContext? = mid?.get(key: "nextmid")
+    XCTAssertEqual(result, nextmid)
+    XCTAssertEqual(99, result.expiry)
+  }
+  
+  
 
 }
 

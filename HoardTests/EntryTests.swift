@@ -13,17 +13,17 @@ import XCTest
 class EntryTests : XCTestCase {
 
   func testIsValidExpired() {
-    let entry = Entry(value: "string", validFor: 0)
-    XCTAssertFalse(entry.isValid)
+    let entry = Entry(value: "string")
+    XCTAssertFalse(entry.isValid(expiry: 0))
   }
  
   func testIsValid() {
-    let entry = Entry(value: "string", validFor: 60)
-    XCTAssertTrue(entry.isValid)
+    let entry = Entry(value: "string")
+    XCTAssertTrue(entry.isValid(expiry: 60))
   }
   
   func testAccessed() {
-    let entry = Entry(value: "string", validFor: 1)
+    let entry = Entry(value: "string")
     let initial = entry.accessed
     let exp = expectation(description: "Dispatch")
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(1)) {
@@ -36,7 +36,7 @@ class EntryTests : XCTestCase {
   }
   
   func testDrift() {
-    let entry = Entry(value: "string", validFor: 1)
+    let entry = Entry(value: "string")
     let exp = expectation(description: "Dispatch")
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(1)) {
       let drift = entry.drift
@@ -47,10 +47,10 @@ class EntryTests : XCTestCase {
   }
   
   func testRot() {
-    let entry = Entry(value: "string", validFor: 2)
+    let entry = Entry(value: "string")
     let exp = expectation(description: "Dispatch")
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(1)) {
-      let rot = entry.rot
+      let rot = entry.rot(expiry: 2)
       XCTAssertTrue(rot > 0.5)
       exp.fulfill()
     }
@@ -58,10 +58,10 @@ class EntryTests : XCTestCase {
   }
   
   func testIsRotten() {
-    let entry = Entry(value: "string", validFor: 2)
+    let entry = Entry(value: "string")
     let exp = expectation(description: "Dispatch")
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(1)) {
-      XCTAssertTrue(entry.isRotten) // Assuming 0.5 rot threshold.
+      XCTAssertTrue(entry.isRotten(expiry: 2)) // Assuming 0.5 rot threshold.
       exp.fulfill()
     }
     waitForExpectations(timeout: 5, handler: nil)

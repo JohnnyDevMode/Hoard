@@ -193,32 +193,37 @@ class MemoryContextTests : XCTestCase {
     waitForExpectations(timeout: 1.0, handler: nil)
   }
   
-//  func testClean() {
-//    let context = MemoryContext()
-//    let key = SimpleKey(key: "key")
-//    context.put(key: key, value: "value", validFor: -1)
-//    context.clean()
-//    XCTAssertNil(context["key"])
-//  }
-//  
-//  func testCleanNested() {
-//    let context = MemoryContext()
-//    let key = ComplexKey(segments: ["complex", "key"])
-//    context.put(key: key, value: "value", validFor: -1)
-//    context.clean()
-//    XCTAssertNil((context["complex"] as! MemoryContext)["key"])
-//  }
-//  
-//  func testCleanChild() {
-//    let context = MemoryContext()
-//    let key = ComplexKey(segments: ["complex", "key"])
-//    context.put(key: SimpleKey(key: "rootvalue"), value: "value", validFor: -1)
-//    context.put(key: key, value: "value", validFor: -1)
-//    (context.get(key: "complex") as Context?)?.clean(deep: false)
-//    XCTAssertNotNil(context["rootvalue"])
-//    XCTAssertNil((context["complex"] as! MemoryContext)["key"])
-//  }
-//  
+  func testClean() {
+    let context = MemoryContext()
+    context.expiry = -1
+    let key = SimpleKey(key: "key")
+    context.put(key: key, value: "value")
+    context.clean()
+    XCTAssertNil(context["key"])
+  }
+
+  func testCleanNested() {
+    let context = MemoryContext()
+    let nested = MemoryContext()
+    nested.expiry = -1
+    context.put(key: "complex", value: nested)
+    let key = ComplexKey(segments: ["complex", "key"])
+    context.put(key: key, value: "value")
+    context.clean()
+    XCTAssertNil(nested["key"])
+  }
+  
+  func testCleanChild() {
+    let context = MemoryContext()
+    context.expiry = -1
+    let key = ComplexKey(segments: ["complex", "key"])
+    context.put(key: SimpleKey(key: "rootvalue"), value: "value")
+    context.put(key: key, value: "value")
+    (context.get(key: "complex") as Context?)?.clean(deep: false)
+    XCTAssertNotNil(context["rootvalue"])
+    XCTAssertNil((context.childContexts["complex"] as! MemoryContext)["key"])
+  }
+  
   func testClear() {
     let context = MemoryContext()
     context.put(key: SimpleKey(key: "key"), value: "value")

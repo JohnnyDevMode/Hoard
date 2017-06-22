@@ -27,13 +27,13 @@ public class MemoryContext : TraversableContext {
   }
   
   override func putLocal<T>(key: String, value: T) {
-    storage[key] = Entry(value: value, validFor: 3600)
+    storage[key] = Entry(value: value)
   }
   
   override func getLocal<T>(key: String) -> T? {
     let stored = storage[key]
     if let entry = stored as? Entry {
-      if entry.isValid, let value = entry.value as? T {
+      if entry.isValid(expiry: expiry), let value = entry.value as? T {
         return value
       }
     } else if let value = stored as? T {
@@ -49,25 +49,20 @@ public class MemoryContext : TraversableContext {
   override func createChild(key: String) -> TraversableContext {
     return MemoryContext()
   }
-
-//  public func clean() {
-//    clean(deep: false)
-//  }
   
-//  public func clean(deep: Bool) {
-//    for (key, value) in storage {
-//      if let entry = value as? Entry {
-//        if !entry.isValid {
-//          storage.removeValue(forKey: key)
-//        } else if deep && entry.isRotten {
-//          storage.removeValue(forKey: key)
-//        }
-//      } else if let context = value as? MemoryContext {
-//        context.clean(deep: deep)
-//      }
-//    }
-//  }
-//  
+  public override func clean(deep: Bool) {
+    super.clean(deep: deep)
+    for (key, value) in storage {
+      if let entry = value as? Entry {
+        if !entry.isValid(expiry: expiry) {
+          storage.removeValue(forKey: key)
+        } else if deep && entry.isRotten(expiry: expiry) {
+          storage.removeValue(forKey: key)
+        }
+      }
+    }
+  }
+
   public override func clear() {
     super.clear()
     storage.removeAll()

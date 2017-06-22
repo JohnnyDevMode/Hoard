@@ -183,4 +183,41 @@ class DiskContextTests : XCTestCase {
     XCTAssertFalse(fileManager.fileExists(atPath: "\(directoryUrl!.path)/file2"))
     XCTAssertFalse(fileManager.fileExists(atPath: "\(directoryUrl!.path)/file2"))
   }
+  
+  
+  func testClean() {
+    let context = DiskContext(dirUrl: directoryUrl!)
+    context.expiry = -1
+    let key = SimpleKey(key: "key")
+    let data = "Some String".data(using: .utf8)
+    context.put(key: key, value: data)
+    context.clean()
+    XCTAssertNil(context.get(key: "key"))
+  }
+  
+  func testCleanNested() {
+    let context = DiskContext(dirUrl: directoryUrl!)
+    let nested = DiskContext(dirUrl: directoryUrl!.appendingPathComponent("complex"))
+    nested.expiry = -1
+    context.put(key: "complex", value: nested)
+    let key = ComplexKey(segments: ["complex", "key"])
+    let data = "Some String".data(using: .utf8)
+    context.put(key: key, value: data)
+    context.clean()
+    XCTAssertNil(nested.get(key: "key"))
+  }
+
+  func testCleanChild() {
+    let context = DiskContext(dirUrl: directoryUrl!)
+    context.expiry = -1
+    let key = ComplexKey(segments: ["complex", "key"])
+    let data = "Some String".data(using: .utf8)
+    context.put(key: SimpleKey(key: "rootvalue"), value: data)
+    context.put(key: key, value: data)
+    (context.get(key: "complex") as Context?)?.clean(deep: false)
+    let rootVal: Data? = context.get(key: "rootvalue")
+    XCTAssertNotNil(rootVal)
+    let nestedVal: Data? = (context.childContexts["complex"] as! DiskContext).get(key: "key")
+    XCTAssertNil(nestedVal)
+  }
 }

@@ -10,15 +10,18 @@ import Foundation
 
 public class DiskContext : TraversableContext {
   
-  private let filemanger = FileManager.default
+  private let fileManager = FileManager.default
   
   private let dirUrl : URL
   
   public init(dirUrl: URL) {
     self.dirUrl = dirUrl
-    if !filemanger.fileExists(atPath: dirUrl.path) {
+    if !fileManager.fileExists(atPath: dirUrl.path) {
       do {
-        try filemanger.createDirectory(at: dirUrl, withIntermediateDirectories: true, attributes: [:])
+        try fileManager.createDirectory(at: dirUrl, withIntermediateDirectories: true, attributes: [:])
+        
+        // TODO: Find directories to populate child contexts  MAYBE
+        
       } catch let error as NSError {
         print("Error creating directoroy: \(error)")
       }
@@ -40,9 +43,9 @@ public class DiskContext : TraversableContext {
   
   public override func removeLocal(key: String) {
     let childUrl = self.childUrl(childName: key)
-    if filemanger.fileExists(atPath: childUrl.path) {
+    if fileManager.fileExists(atPath: childUrl.path) {
       do {
-        try filemanger.removeItem(at: childUrl)
+        try fileManager.removeItem(at: childUrl)
       } catch let error as NSError {
         print("Remove error: \(error)")
       }
@@ -51,11 +54,41 @@ public class DiskContext : TraversableContext {
   
   public override func clear() {
     do {
-      for file in try filemanger.contentsOfDirectory(atPath: dirUrl.path) {
-        try filemanger.removeItem(atPath: "\(dirUrl.path)/\(file)")
+      for file in try fileManager.contentsOfDirectory(atPath: dirUrl.path) {
+        try fileManager.removeItem(atPath: "\(dirUrl.path)/\(file)")
       }
     } catch let error as NSError {
       print("Clear Error: \(error)")
+    }
+  }
+  
+  public override func clean(deep: Bool) {
+    clean(directory: dirUrl.path, deep: deep)
+  }
+  
+  private func clean(directory: String, deep: Bool) {
+    super.clean(deep: deep)
+    do {
+      for file in try fileManager.contentsOfDirectory(atPath: directory) {
+        let child = directory.appending("/\(file)")
+        var isDir: ObjCBool = false
+        if (fileManager.fileExists(atPath: child, isDirectory: &isDir)) {
+          if isDir.boolValue {
+            if childContexts[file] == nil {
+              clean(directory: child, deep: deep)
+            }
+          } else {
+            let attributes = try fileManager.attributesOfItem(atPath: child) as NSDictionary
+            if let created = attributes.fileCreationDate(), Date().timeIntervalSince(created) > expiry {
+              try fileManager.removeItem(atPath: child)
+            } else if deep, let modifed = attributes.fileModificationDate(), (Date().timeIntervalSince(modifed) / expiry) > ROT_THRESHOLD {
+              try fileManager.removeItem(atPath: child)
+            }
+          }
+        }
+      }
+    } catch let error as NSError {
+      print("Clean Error: \(error)")
     }
   }
   

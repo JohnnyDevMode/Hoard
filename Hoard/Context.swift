@@ -8,7 +8,9 @@
 
 import Foundation
 
-protocol Context {
+public protocol Context {
+  
+  var expiry: Double { get set }
   
   func put<T>(key: Keyable, value: T)
   
